@@ -25,6 +25,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string.hpp> // the models use boost::to_upper, split, trim
 
 #include <ItcLogger/Logger.hpp>
 #include <Client/Bus.hpp>

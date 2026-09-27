@@ -21,6 +21,8 @@
 #include <sim_data_provider_maker.hpp>
 #define REGISTER_DATA_PROVIDER(T,K) static Nos3::SimDataProviderMaker<T> maker(K) // T = type, K = key
 
+#include <boost/shared_ptr.hpp>
+
 #include <sim_config.hpp>
 #include <sim_i_data_point.hpp>
 
