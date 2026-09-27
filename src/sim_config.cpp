@@ -132,7 +132,22 @@ namespace Nos3
                         library = "lib" + simulator_name + "_sim.so"; // guess a name
                     }
                     sim_logger->info("SimConfig::get_config_for_simulator:  Loading plug-in library %s", library.c_str());
-                    if (dlopen(library.c_str(), RTLD_LAZY | RTLD_LOCAL) == NULL)
+                    void *handle = dlopen(library.c_str(), RTLD_LAZY | RTLD_LOCAL);
+#if defined(__APPLE__)
+                    // macOS dlopen does not search the executable's rpath for a
+                    // bare name, and CMake builds plug-ins as .dylib: also try
+                    // <exe>/../lib with both suffixes.
+                    std::string dylib = library;
+                    if (dylib.size() > 3 && dylib.compare(dylib.size() - 3, 3, ".so") == 0)
+                        dylib = dylib.substr(0, dylib.size() - 3) + ".dylib";
+                    for (const std::string &candidate : {dylib, "@executable_path/../lib/" + library,
+                                                         "@executable_path/../lib/" + dylib})
+                    {
+                        if (handle == NULL)
+                            handle = dlopen(candidate.c_str(), RTLD_LAZY | RTLD_LOCAL);
+                    }
+#endif
+                    if (handle == NULL)
                     {   // Try to load the library so any plug-ins get registered
                         sim_logger->warning("SimConfig::get_config_for_simulator:  WARNING, did NOT load plug-in library %s.  Error: %s", library.c_str(), dlerror());
                     }
